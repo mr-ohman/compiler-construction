@@ -1,0 +1,198 @@
+-- programs ------------------------------------------------
+
+entrypoints Program ;
+
+Program.   Program ::= [TopDef] ;
+
+FnDef.	   TopDef ::= Type Ident "(" [Arg] ")" Block ;
+
+StructDef. TopDef ::= "struct" Ident "{" [StrDecl] "}" ";" ;
+
+TypeDef.   TopDef ::= "typedef" "struct" Ident "*" Ident ";" ;
+
+ClassDef.  TopDef ::= "class" Ident "{" [ClassDecl] "}" ;
+
+ExtendDef. TopDef ::= "class" Ident "extends" Ident "{" [ClassDecl] "}" ;
+
+separator nonempty TopDef "" ;
+
+Arg. 	   Arg ::= Type Ident;
+
+separator  Arg "," ;
+
+StrDecl.   StrDecl ::= Type [Ident] ;
+
+terminator StrDecl ";" ;
+
+separator Ident "," ;
+
+-- class definitions ---------------------------------------
+
+ClassVar.  ClassDecl ::= StrDecl ";" ;
+
+Method.    ClassDecl ::= Type Ident "(" [Arg] ")" Block ;
+
+separator ClassDecl "" ;
+
+-- statements ----------------------------------------------
+
+Block.     Block ::= "{" [Stmt] "}" ;
+
+separator  Stmt "" ;
+
+Empty.     Stmt ::= ";" ;
+
+BStmt.     Stmt ::= Block ;
+
+Decl.      Stmt ::= Type [Item] ";" ;
+
+NoInit.    Item ::= Ident ; 
+
+Init.      Item ::= Ident "=" Expr ;
+
+separator nonempty Item "," ;
+
+Ass.       Stmt ::= Variable "=" Expr  ";" ;
+
+Incr.      Stmt ::= Variable "++"  ";" ;
+
+Decr.      Stmt ::= Variable "--"  ";" ;
+
+Ret.       Stmt ::= "return" Expr ";" ;
+
+VRet.      Stmt ::= "return" ";" ;
+
+Cond.      Stmt ::= "if" "(" Expr ")" Stmt  ;
+
+CondElse.  Stmt ::= "if" "(" Expr ")" Stmt "else" Stmt  ;
+
+While.     Stmt ::= "while" "(" Expr ")" Stmt ;
+
+For.       Stmt ::= "for" "(" Type Ident ":" Expr ")" Stmt ;
+
+SExp.      Stmt ::= Expr  ";" ;
+
+-- Types ---------------------------------------------------
+
+Int.       Type1 ::= "int" ;
+
+Doub.      Type1 ::= "double" ;
+
+Bool.      Type1 ::= "boolean" ;
+
+Void.      Type1 ::= "void" ;
+
+Custom.    Type1 ::= Ident ;
+
+Array.     Type ::= Type "[]" ;
+
+_.         Type ::= Type1 ;
+
+internal   String. Type ::= "_string" ;
+
+internal   Fun. Type ::= Type "(" [Type] ")" ;
+
+internal   Pointer. Type ::= Ident "*" ;
+
+internal   Wildcard. Type ::= "_*_" ;
+
+separator  Type "," ;
+
+-- Variables -----------------------------------------------
+
+VIdent.    Variable1 ::= Ident ;
+
+VIndex.	   Variable1 ::= Ident [ArrayIndex] ;
+
+VDeref.    Variable ::= Variable "->" Variable1 ;
+
+internal VAnnDeref. Variable ::= "(" Type ")" Variable "->" Variable1 ;
+
+_. Variable ::= Variable1 ;
+
+AIndex.	   ArrayIndex ::= "[" Expr "]" ;
+
+separator nonempty ArrayIndex "" ;
+
+-- Expressions ---------------------------------------------
+
+EVar.      Expr7 ::= Variable ;
+
+ELitInt.   Expr7 ::= Integer ;
+
+ELitDoub.  Expr7 ::= Double;
+
+ELitTrue.  Expr7 ::= "true" ;
+
+ELitFalse. Expr7 ::= "false" ;
+
+ENew.      Expr7 ::= "new" Ident ;
+
+internal ENewClass. Expr7 ::= "new" Ident ;
+
+ENewArr.   Expr7 ::= "new" Type1 [ArrayIndex] ;
+
+ENull.     Expr7 ::= "(" Type ")null" ;
+
+EApp.      Expr7 ::= Ident "(" [Expr] ")" ;
+
+EString.   Expr7 ::= String ;
+
+EDot.      Expr6 ::= Expr6 "." Expr7 ;
+
+Neg.       Expr5 ::= "-" Expr6 ;
+
+Not.       Expr5 ::= "!" Expr6 ;
+
+EMul.      Expr4 ::= Expr4 MulOp Expr5 ;
+
+EAdd.      Expr3 ::= Expr3 AddOp Expr4 ;
+
+ERel.      Expr2 ::= Expr2 RelOp Expr3 ;
+
+EAnd.      Expr1 ::= Expr2 "&&" Expr1 ;
+
+EOr.       Expr ::= Expr1 "||" Expr ;
+
+internal   Ann. Expr ::= "(" Type ")" Expr ;
+
+internal   ELength. Expr6 ::= "_length" ;
+
+internal   ObjCast. Expr ::= "(" Type ")" Expr ;
+
+coercions  Expr 7 ;
+
+separator  Expr "," ;
+
+-- operators -----------------------------------------------
+
+Plus.      AddOp ::= "+" ;
+
+Minus.     AddOp ::= "-" ;
+
+Times.     MulOp ::= "*" ;
+
+Div.       MulOp ::= "/" ;
+
+Mod.       MulOp ::= "%" ;
+
+LTH.       RelOp ::= "<" ;
+
+LE.        RelOp ::= "<=" ;
+
+GTH.       RelOp ::= ">" ;
+
+GE.        RelOp ::= ">=" ;
+
+EQU.       RelOp ::= "==" ;
+
+NE.        RelOp ::= "!=" ;
+
+-- comments ------------------------------------------------
+
+comment    "#" ;
+
+comment    "//" ;
+
+comment    "/*" "*/" ;
+
